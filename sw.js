@@ -1,0 +1,6 @@
+var V='bk-v1',P=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'],H=['cdnjs.cloudflare.com','fonts.googleapis.com','fonts.gstatic.com','www.gstatic.com'];
+self.addEventListener('install',function(e){e.waitUntil(caches.open(V).then(function(c){return c.addAll(P)}).then(function(){return self.skipWaiting()}))});
+self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.filter(function(x){return x!=V}).map(function(x){return caches.delete(x)}))}).then(function(){return self.clients.claim()}))});
+self.addEventListener('fetch',function(e){var r=e.request,u=new URL(r.url);if(r.method!='GET')return;
+if(r.mode=='navigate'){e.respondWith(fetch(r).then(function(x){var c=x.clone();caches.open(V).then(function(h){h.put('./index.html',c)});return x}).catch(function(){return caches.match('./index.html')}));return}
+if(u.origin==location.origin||H.indexOf(u.hostname)>-1){e.respondWith(caches.match(r).then(function(m){var n=fetch(r).then(function(x){if(x&&(x.ok||x.type=='opaque')){var c=x.clone();caches.open(V).then(function(h){h.put(r,c)})}return x}).catch(function(){return m});return m||n}))}});
